@@ -20,12 +20,39 @@ canvas {
   display: block;
 }
 
+#toggle-editor {
+  position: absolute;
+  right: 420px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: #222;
+  color: #aaa;
+  border: 1px solid #333;
+  border-right: none;
+  padding: 8px 4px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px 0 0 4px;
+  transition: right 0.3s ease;
+}
+#toggle-editor:hover { color: #fff; background: #333; }
+
+#top.editor-hidden #toggle-editor {
+  right: 0;
+}
+
 #editor-panel {
   width: 420px;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #333;
   background: #111;
+  transition: margin-right 0.3s ease;
+}
+
+#top.editor-hidden #editor-panel {
+  margin-right: -420px;
 }
 
 #editor-header {

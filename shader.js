@@ -60,6 +60,21 @@ editor.addEventListener('keydown', e => {
   }
 });
 
+// ─── Toggle editor panel ────────────────────────────────────────────
+const toggleBtn = document.getElementById('toggle-editor');
+const topEl     = document.getElementById('top');
+
+toggleBtn.addEventListener('click', () => {
+  topEl.classList.toggle('editor-hidden');
+  toggleBtn.textContent = topEl.classList.contains('editor-hidden') ? '▶' : '◀';
+  // Resize canvas to fill the freed space
+  setTimeout(() => {
+    canvas.width  = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    sandbox.resize();
+  }, 350);
+});
+
 // ─── Boot: load shader.frag into editor and compile ─────────────────
 fetch('shader.frag')
   .then(r => r.text())
