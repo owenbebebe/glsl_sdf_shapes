@@ -2,14 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GLSL Playground</title>
+  <title>SDF Shape Editor</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- ─── Toolbar ─────────────────────────────────────────────────────── -->
+<div id="toolbar">
+  <span id="toolbar-title">SDF Editor</span>
+
+  <div id="tool-group">
+    <!-- Shape tools -->
+    <div class="tool-section">
+      <button id="tool-circle" class="tool-btn active" title="Circle tool (C)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="10" cy="10" r="7"/>
+        </svg>
+        Circle
+      </button>
+    </div>
+
+    <div class="tool-divider"></div>
+
+    <!-- Action tools -->
+    <div class="tool-section">
+      <button id="tool-scale" class="tool-btn" title="Scale selected shape (S)" disabled>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 4h5M4 4v5M16 16h-5M16 16v-5M4 4l12 12"/>
+        </svg>
+        Scale
+      </button>
+      <button id="tool-delete" class="tool-btn danger" title="Delete selected shape (Del)" disabled>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="5,7 6,17 14,17 15,7"/>
+          <line x1="3" y1="7" x2="17" y2="7"/>
+          <path d="M8,7V4h4v3"/>
+        </svg>
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar-right">
+    <span id="shape-count-label">0 / 16 shapes</span>
+    <button id="toggle-editor" title="Toggle shader editor (E)">Editor ◀</button>
+  </div>
+</div>
+
+<!-- ─── Main canvas + editor layout ────────────────────────────────── -->
 <div id="top">
-  <canvas id="c" width="500" height="500"></canvas>
-  <button id="toggle-editor" title="Toggle editor">◀</button>
+  <div id="canvas-wrap">
+    <canvas id="c"></canvas>
+    <div id="canvas-hint">Click to place a circle</div>
+  </div>
 
   <div id="editor-panel">
     <div id="editor-header">
