@@ -36,12 +36,14 @@ float smin(float a, float b, float k) {
     return mix(b, a, h) - k * h * (1.0 - h);
 }
 
-// Populate parallel center/radius arrays from the flattened uniforms.
-// GLSL 1.00 (WebGL1) requires constant loop bounds, so we unroll via macros.
-vec2  gCenter[16];
-float gRadius[16];
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
-void loadShapes() {
+void main() {
+    vec2 st = (2.0 * gl_FragCoord.xy - u_resolution.xy) / u_resolution.y;
+
+    // ── Populate shape arrays (local — GLSL ES 1.00 forbids global mutable arrays) ──
+    vec2  gCenter[16];
+    float gRadius[16];
     gCenter[0]  = u_shape_center_0;  gRadius[0]  = u_shape_radius_0;
     gCenter[1]  = u_shape_center_1;  gRadius[1]  = u_shape_radius_1;
     gCenter[2]  = u_shape_center_2;  gRadius[2]  = u_shape_radius_2;
@@ -58,20 +60,12 @@ void loadShapes() {
     gCenter[13] = u_shape_center_13; gRadius[13] = u_shape_radius_13;
     gCenter[14] = u_shape_center_14; gRadius[14] = u_shape_radius_14;
     gCenter[15] = u_shape_center_15; gRadius[15] = u_shape_radius_15;
-}
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
-
-void main() {
-    vec2 st = (2.0 * gl_FragCoord.xy - u_resolution.xy) / u_resolution.y;
 
     // ── Palette ──────────────────────────────────────────────────────────────
     vec3 bg_color    = vec3(0.10, 0.10, 0.12);
     vec3 fill_color  = vec3(0.80, 0.80, 0.84);
     vec3 sel_tint    = vec3(0.28, 0.62, 1.00);
     vec3 outline_col = vec3(0.18, 0.52, 1.00);
-
-    loadShapes();
 
     float scene_dist = 1e9;
     float sel_dist   = 1e9;
@@ -86,14 +80,30 @@ void main() {
         if (float(i) == u_selected) sel_dist = d;
     }
 
-    // ── Base colour ───────────────────────────────────────────────────────────
-    vec3 color = bg_color;
+    // ── Ripple bands (inside + outside) ──────────────────────────────────────
+    // cos(d * freq) produces continuous concentric rings that cross the
+    // shape boundary seamlessly — negative d inside, positive outside.
+    // step(0.0, cos(...)) snaps the gradient to hard alternating bands,
+    // matching the graphic poster look in the reference image.
+    float freq      = 28.0;                         // band frequency
+    float band      = step(0.0, cos(scene_dist * freq + u_time * 1.2));
 
-    if (scene_dist <= 0.0) {
-        bool in_sel = (u_selected >= 0.0) && (sel_dist <= 0.0);
-        color = in_sel ? mix(fill_color, sel_tint, 0.30) : fill_color;
-        // Subtle concentric distance ripple
-        color *= 0.90 + 0.10 * cos(scene_dist * 110.0);
+    // Outside palette: warm orange / dark brown
+    vec3  out_light = vec3(0.92, 0.62, 0.18);
+    vec3  out_dark  = vec3(0.65, 0.38, 0.08);
+
+    // Inside palette: sky blue / deep blue
+    vec3  in_light  = vec3(0.38, 0.72, 0.95);
+    vec3  in_dark   = vec3(0.18, 0.40, 0.75);
+
+    vec3 color;
+    if (u_shape_count < 1.0) {
+        // No shapes placed yet — show neutral background
+        color = bg_color;
+    } else if (scene_dist > 0.0) {
+        color = mix(out_dark, out_light, band);
+    } else {
+        color = mix(in_dark,  in_light,  band);
     }
 
     // ── Selection outline ─────────────────────────────────────────────────────
