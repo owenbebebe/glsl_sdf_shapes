@@ -85,25 +85,27 @@ void main() {
     // shape boundary seamlessly — negative d inside, positive outside.
     // step(0.0, cos(...)) snaps the gradient to hard alternating bands,
     // matching the graphic poster look in the reference image.
-    float freq      = 28.0;                         // band frequency
-    float band      = step(0.0, cos(scene_dist * freq + u_time * 1.2));
+    float freq      = 50.0;                         // band frequency
+    float band      = smoothstep(0.0, 0.5, cos(pow(scene_dist, 3.) * freq - u_time * 5.0));
 
-    // Outside palette: warm orange / dark brown
-    vec3  out_light = vec3(0.92, 0.62, 0.18);
-    vec3  out_dark  = vec3(0.65, 0.38, 0.08);
+    vec3  light_r_color = vec3(1.0, 0.62, 0.44);
+    vec3 light_g_color = vec3(0.87, 1.0, 0.67);
+    vec3 light_b_color = vec3(0.69, 0.72, 0.88);
+    vec3 light_primary_color = vec3(1.0);
+    vec3  out_light_color = vec3(1.0);
+    vec3  out_dark_color  = vec3(0.0, 0.07, 0.05);
 
     // Inside palette: sky blue / deep blue
-    vec3  in_light  = vec3(0.38, 0.72, 0.95);
-    vec3  in_dark   = vec3(0.18, 0.40, 0.75);
-
+    vec3  in_light_color  = vec3(0.38, 0.72, 0.95);
+    vec3  in_dark_color   = vec3(0.18, 0.40, 0.75);
     vec3 color;
     if (u_shape_count < 1.0) {
         // No shapes placed yet — show neutral background
         color = bg_color;
     } else if (scene_dist > 0.0) {
-        color = mix(out_dark, out_light, band);
+        color = mix(out_dark_color, out_light_color, band);
     } else {
-        color = mix(in_dark,  in_light,  band);
+        color = in_light_color;
     }
 
     // ── Selection outline ─────────────────────────────────────────────────────
