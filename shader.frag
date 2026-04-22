@@ -21,11 +21,19 @@ uniform float u_shape_radius_12, u_shape_radius_13, u_shape_radius_14, u_shape_r
 
 uniform float u_shape_count;  // number of active shapes (0-16)
 uniform float u_selected;     // array-index of selected shape, -1 = none
+uniform float u_blend_k;      // smooth-union blend radius (0 = hard union)
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 float sdCircle(vec2 p, float r) {
     return length(p) - r;
+}
+
+// Polynomial smooth-minimum (Inigo Quilez).
+// k controls the blend radius: larger k → wider, softer merge.
+float smin(float a, float b, float k) {
+    float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+    return mix(b, a, h) - k * h * (1.0 - h);
 }
 
 // Populate parallel center/radius arrays from the flattened uniforms.
@@ -73,7 +81,8 @@ void main() {
     for (int i = 0; i < 16; i++) {
         if (float(i) >= u_shape_count) break;
         float d = sdCircle(st - gCenter[i], gRadius[i]);
-        scene_dist = min(scene_dist, d);
+        // Use smooth-min when a blend radius is set, hard min otherwise
+        scene_dist = (u_blend_k > 0.0) ? smin(scene_dist, d, u_blend_k) : min(scene_dist, d);
         if (float(i) == u_selected) sel_dist = d;
     }
 

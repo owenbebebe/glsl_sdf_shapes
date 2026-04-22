@@ -40,10 +40,21 @@
         </svg>
         Delete
       </button>
+    <div class="tool-divider"></div>
+
+    <!-- Blend control -->
+    <div class="tool-section">
+      <label class="blend-label" for="blend-slider">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="7" cy="10" r="4"/>
+          <circle cx="13" cy="10" r="4"/>
+        </svg>
+        Blend
+      </label>
+      <input id="blend-slider" type="range" min="0" max="0.6" step="0.01" value="0.12" title="Smooth-union blend radius">
+      <span id="blend-value">0.12</span>
     </div>
   </div>
-
-  <div class="toolbar-right">
     <span id="shape-count-label">0 / 16 shapes</span>
     <button id="toggle-editor" title="Toggle shader editor (E)">Editor ◀</button>
   </div>

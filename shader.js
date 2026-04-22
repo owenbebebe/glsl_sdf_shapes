@@ -12,6 +12,7 @@ const MAX_SHAPES        = 16;
 const DEFAULT_RADIUS    = 0.18;   // in normalised coords (Y spans -1..+1)
 const HIT_TOLERANCE     = 0.015;  // extra px tolerance for selection clicks
 const SCALE_SENSITIVITY = 0.004;  // radius change per drag pixel
+const DEFAULT_BLEND_K   = 0.12;   // initial smooth-union blend radius
 
 // ─── GlslCanvas setup ────────────────────────────────────────────────────────
 
@@ -44,6 +45,7 @@ window.addEventListener('resize', () => {
 let shapes      = [];   // Shape[]
 let nextId      = 0;
 let selectedId  = -1;   // shape.id of selected shape, or -1
+let blendK      = DEFAULT_BLEND_K;
 
 // ─── Tool / interaction state ─────────────────────────────────────────────────
 
@@ -72,6 +74,8 @@ const countLabel    = document.getElementById('shape-count-label');
 const statusBar     = document.getElementById('status-bar');
 const editor        = document.getElementById('shader-editor');
 const runBtn        = document.getElementById('run-btn');
+const blendSlider   = document.getElementById('blend-slider');
+const blendValueEl  = document.getElementById('blend-value');
 
 // ─── Coordinate helpers ───────────────────────────────────────────────────────
 
@@ -143,6 +147,9 @@ function pushUniforms() {
     }
   }
   sandbox.setUniform('u_shape_count', shapes.length);
+
+  // Blend radius
+  sandbox.setUniform('u_blend_k', blendK);
 
   // Map selectedId (shape identity) → array index expected by the shader
   let selIndex = -1;
@@ -336,6 +343,12 @@ btnScale.addEventListener('click', () => {
 });
 
 btnDelete.addEventListener('click', deleteSelected);
+
+blendSlider.addEventListener('input', () => {
+  blendK = parseFloat(blendSlider.value);
+  blendValueEl.textContent = blendK.toFixed(2);
+  pushUniforms();
+});
 
 // ─── Keyboard shortcuts ───────────────────────────────────────────────────────
 
