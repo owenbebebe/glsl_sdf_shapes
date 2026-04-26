@@ -18,8 +18,8 @@ uniform float u_shape_radius_8,  u_shape_radius_9,  u_shape_radius_10, u_shape_r
 uniform float u_shape_radius_12, u_shape_radius_13, u_shape_radius_14, u_shape_radius_15;
 
 uniform float u_shape_count;  
-uniform float u_selected;     
-uniform float u_blend_k;      
+uniform float u_selected;
+uniform float u_blend_k;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -124,10 +124,13 @@ void main() {
     
     // INJECT NOISE INTO RIPPLES: We center the noise around 0 (-0.5 to 0.5) 
     // and multiply by a scale factor. We add this to the phase of the cosine.
-    float edge_distortion = (n1 - 0.5) * 2.5; 
+    
+    // temp remove the distortion function call for now 
+    //float edge_distortion = (n1 - 0.5) * 2.5; 
     
     // Note: We use abs(scene_dist) to ensure pow() doesn't break on negative interior values
-    float band = smoothstep(0.0, 0.5, cos(pow(abs(scene_dist), 3.) * freq - u_time * 5.0 + edge_distortion));
+    //float band = smoothstep(0.0, 0.5, cos(pow(abs(scene_dist), 3.) * freq - u_time * 5.0 + edge_distortion));
+    float band = smoothstep(0.0, 0.5, cos(pow(abs(scene_dist), 3.) * freq - u_time * 5.0 ));
 
     vec3 light_r_color = vec3(0.98, 0.91, 0.87);
     vec3 light_g_color = vec3(0.97, 1.0, 0.93);
@@ -144,8 +147,7 @@ void main() {
     out_light_color = mix(out_light_color, light_b_color, mask);
     vec3 out_dark_color  = vec3(0.0);
 
-    vec3  in_light_color  = vec3(0.38, 0.72, 0.95);
-    vec3  in_dark_color   = vec3(0.18, 0.40, 0.75);
+    vec3  in_light_color  = vec3(1.0);
     vec3 color;
     
     if (u_shape_count < 1.0) {
